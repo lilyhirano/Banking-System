@@ -1,10 +1,18 @@
 from abc import ABC
 
+class Account():
+    
+    def __init__(self, account_id):
+      self.account_id = account_id
+      self.balance = 0
+      self.record = {} #timestamp : balance
+
 
 class BankingSystem(ABC):
     """
     `BankingSystem` interface.
     """
+    ACCOUNTS = {} #account_id : Account
 
     def create_account(self, timestamp: int, account_id: str) -> bool:
         """
@@ -13,8 +21,14 @@ class BankingSystem(ABC):
         Returns `True` if the account was successfully created or
         `False` if an account with `account_id` already exists.
         """
-        # default implementation
-        return False
+        if account_id in self.ACCOUNTS.keys():
+          return False
+        
+        new_account = Account(account_id)
+        new_account.record[timestamp] = 0
+        self.ACCOUNTS[account_id] = new_account
+
+        return True
 
     def deposit(self, timestamp: int, account_id: str, amount: int) -> int | None:
         """
@@ -25,8 +39,15 @@ class BankingSystem(ABC):
         If the specified account doesn't exist, should return
         `None`.
         """
-        # default implementation
-        return None
+        if account_id not in self.ACCOUNTS.keys():
+          return None
+        
+        self.ACCOUNTS[account_id].balance += amount
+        self.ACCOUNTS[account_id].record[timestamp] = self.ACCOUNTS[account_id].balance
+
+        return self.ACCOUNTS[account_id].balance
+        
+            
 
     def transfer(self, timestamp: int, source_account_id: str, target_account_id: str, amount: int) -> int | None:
         """
@@ -41,8 +62,20 @@ class BankingSystem(ABC):
           * Returns `None` if account `source_account_id` has
           insufficient funds to perform the transfer.
         """
-        # default implementation
-        return None
+        if source_account_id not in self.ACCOUNTS.keys() or target_account_id not in self.ACCOUNTS.keys():
+          return None
+        
+        if self.ACCOUNTS[source_account_id].balance < amount:
+           return None
+        
+        self.ACCOUNTS[source_account_id].balance -= amount
+        self.ACCOUNTS[target_account_id].balance += amount
+
+        self.ACCOUNTS[source_account_id].record[timestamp] = self.ACCOUNTS[source_account_id].balance
+        self.ACCOUNTS[target_account_id].record[timestamp] = self.ACCOUNTS[target_account_id].balance
+
+        return self.ACCOUNTS[source_account_id].balance
+           
 
     def top_spenders(self, timestamp: int, n: int) -> list[str]:
         """
