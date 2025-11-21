@@ -5,6 +5,6 @@ class BankingSystemImpl(BankingSystem):
 
     def __init__(self):
         # TODO: implement
-        pass
+        super().__init__()
 
     # TODO: implement interface methods here

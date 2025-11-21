@@ -1,4 +1,5 @@
 from abc import ABC
+import numpy as np
 
 class Account():
     
@@ -6,7 +7,16 @@ class Account():
       self.account_id = account_id
       self.balance = 0
       self.record = {} #timestamp : balance
+      self.transfer_amt = 0
 
+    def update_balance(self, amount : int):
+        self.balance += amount
+
+    def update_record(self, timestamp : int):
+       self.record[timestamp] = self.balance
+         
+    def update_transfer_amt(self, amount : int):
+       self.transfer_amt += amount
 
 class BankingSystem(ABC):
     """
@@ -25,7 +35,7 @@ class BankingSystem(ABC):
           return False
         
         new_account = Account(account_id)
-        new_account.record[timestamp] = 0
+        new_account.update_record(timestamp)
         self.ACCOUNTS[account_id] = new_account
 
         return True
@@ -42,8 +52,8 @@ class BankingSystem(ABC):
         if account_id not in self.ACCOUNTS.keys():
           return None
         
-        self.ACCOUNTS[account_id].balance += amount
-        self.ACCOUNTS[account_id].record[timestamp] = self.ACCOUNTS[account_id].balance
+        self.ACCOUNTS[account_id].update_balance(amount)
+        self.ACCOUNTS[account_id].update_record(timestamp)
 
         return self.ACCOUNTS[account_id].balance
         
@@ -68,16 +78,18 @@ class BankingSystem(ABC):
         if self.ACCOUNTS[source_account_id].balance < amount:
            return None
         
-        self.ACCOUNTS[source_account_id].balance -= amount
-        self.ACCOUNTS[target_account_id].balance += amount
+        self.ACCOUNTS[source_account_id].update_balance(-1 * amount)
+        self.ACCOUNTS[target_account_id].update_balance(amount)
 
-        self.ACCOUNTS[source_account_id].record[timestamp] = self.ACCOUNTS[source_account_id].balance
-        self.ACCOUNTS[target_account_id].record[timestamp] = self.ACCOUNTS[target_account_id].balance
+        self.ACCOUNTS[source_account_id].update_record(timestamp)
+        self.ACCOUNTS[target_account_id].update_record(timestamp)
+
+        self.ACCOUNTS[source_account_id].update_transfer_amt(amount)
 
         return self.ACCOUNTS[source_account_id].balance
            
 
-    def top_spenders(self, timestamp: int, n: int) -> list[str]:
+    def top_spenders(self, timestamp: int, n: int) :#-> list[str]:
         """
         Should return the identifiers of the top `n` accounts with
         the highest outgoing transactions - the total amount of
@@ -89,14 +101,28 @@ class BankingSystem(ABC):
         format: `["<account_id_1>(<total_outgoing_1>)", "<account_id
         _2>(<total_outgoing_2>)", ..., "<account_id_n>(<total_outgoi
         ng_n>)"]`.
-          * If less than `n` accounts exist in the system, then return
+          * If less than `n` accou_idnts exist in the system, then return
           all their identifiers (in the described format).
           * Cashback (an operation that will be introduced in level 3)
           should not be reflected in the calculations for total
           outgoing transactions.
         """
-        # default implementation
-        return []
+        transfers = np.array([(account.account_id, account.transfer_amt) for account in self.ACCOUNTS.values()],
+                              dtype = [('id', 'U10'), ('amt','i4')])
+        sorted_transfers = np.sort(transfers, order = ['amt', 'id'])[::-1]
+
+        if len(self.ACCOUNTS) < n:
+          result = [f"{row['id']}({row['amt']})" for row in sorted_transfers]
+
+        else:
+          top_n = sorted_transfers[:n]
+          result = [f"{row['id']}({row['amt']})" for row in top_n]
+
+        return result
+
+        
+        
+
 
     def pay(self, timestamp: int, account_id: str, amount: int) -> str | None:
         """

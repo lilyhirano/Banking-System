@@ -1,0 +1,27 @@
+
+test1:
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_01_basic_create
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_02_basic_create_and_deposit
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_03_basic_create_deposit_and_transfer
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_04_create_edge_case
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_05_deposit_edge_case
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_06_transfer_edge_cases
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_07_all_successful_operations_1
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_08_all_successful_operations_2
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_09_all_operations_1
+	python -m unittest level_1_tests.Level1Tests.test_level_1_case_10_all_operations_2
+
+test2:
+	python3 -m unittest level_2_tests.Level2Tests
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_01_basic_top_spenders_1
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_02_basic_top_spenders_2
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_03_basic_top_spenders_3
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_04_top_spenders_with_failed_transfers
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_05_top_spenders_alphabetical_order_1
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_06_top_spenders_alphabetical_order_2
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_07_all_commands_1
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_08_all_commands_2
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_09_all_commands_3
+	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_10_all_commands_4
+
+
