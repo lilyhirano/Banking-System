@@ -12,16 +12,43 @@ test1:
 	python -m unittest level_1_tests.Level1Tests.test_level_1_case_10_all_operations_2
 
 test2:
-	python3 -m unittest level_2_tests.Level2Tests
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_01_basic_top_spenders_1
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_02_basic_top_spenders_2
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_03_basic_top_spenders_3
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_04_top_spenders_with_failed_transfers
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_05_top_spenders_alphabetical_order_1
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_06_top_spenders_alphabetical_order_2
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_07_all_commands_1
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_08_all_commands_2
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_09_all_commands_3
-	python3 -m unittest level_2_tests.Level2Tests.test_level_2_case_10_all_commands_4
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_01_basic_top_spenders_1
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_02_basic_top_spenders_2
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_03_basic_top_spenders_3
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_04_top_spenders_with_failed_transfers
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_05_top_spenders_alphabetical_order_1
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_06_top_spenders_alphabetical_order_2
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_07_all_commands_1
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_08_all_commands_2
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_09_all_commands_3
+	python -m unittest level_2_tests.Level2Tests.test_level_2_case_10_all_commands_4
 
+
+test3:
+	python unittest level_3_tests.test_level_3_case_01_basic_pay
+	python unittest level_3_tests.test_level_3_case_02_basic_pay_cashback
+	python unittest level_3_tests.test_level_3_case_03_basic_pay_and_get_status_1
+	python unittest level_3_tests.test_level_3_case_04_basic_pay_and_get_status_2
+	python unittest level_3_tests.test_level_3_case_05_pay_edge_cases
+	python unittest level_3_tests.test_level_3_case_06_get_payment_status_edge_cases
+	python unittest level_3_tests.test_level_3_case_07_pay_is_reflected_in_top_spenders
+	python unittest level_3_tests.test_level_3_case_08_all_operations_1
+	python unittest level_3_tests.test_level_3_case_09_all_operations_2
+	python unittest level_3_tests.test_level_3_case_10_all_operations_3
+
+test4:
+	python unittest level_4_tests.test_level_4_case_01_deletes_account_2_and_combines_balances
+	python unittest level_4_tests.test_level_4_case_02_shows_correct_spender_stats
+	python unittest level_4_tests.test_level_4_case_03_cashback_deposits_are_processed
+	python unittest level_4_tests.test_level_4_case_04_basic_get_balance
+	python unittest level_4_tests.test_level_4_case_05_get_balance_with_payment_cashback
+	python unittest level_4_tests.test_level_4_case_06_get_balance_edge_cases
+	python unittest level_4_tests.test_level_4_case_07_merge_edge_cases
+	python unittest level_4_tests.test_level_4_case_08_all_operations_1
+	python unittest level_4_tests.test_level_4_case_09_all_operations_2
+	python unittest level_4_tests.test_level_4_case_10_all_operations_3
+
+
+custom_test:
+	python trial_testing.py
 

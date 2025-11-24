@@ -72,6 +72,9 @@ class BankingSystem(ABC):
           * Returns `None` if account `source_account_id` has
           insufficient funds to perform the transfer.
         """
+        if source_account_id == target_account_id:
+           return None
+
         if source_account_id not in self.ACCOUNTS.keys() or target_account_id not in self.ACCOUNTS.keys():
           return None
         
@@ -107,16 +110,17 @@ class BankingSystem(ABC):
           should not be reflected in the calculations for total
           outgoing transactions.
         """
-        transfers = np.array([(account.account_id, account.transfer_amt) for account in self.ACCOUNTS.values()],
-                              dtype = [('id', 'U10'), ('amt','i4')])
-        sorted_transfers = np.sort(transfers, order = ['amt', 'id'])[::-1]
+        transfers = np.array([(account.account_id, -account.transfer_amt) for account in self.ACCOUNTS.values()],
+                              dtype = [('id', 'U10'), ('amt','i4')])    #negative amt allows for desc. amt w/o inverting
+
+        sorted_transfers = np.sort(transfers, order=['amt', 'id'], kind='stable')
 
         if len(self.ACCOUNTS) < n:
-          result = [f"{row['id']}({row['amt']})" for row in sorted_transfers]
+          result = [f"{row['id']}({-row['amt']})" for row in sorted_transfers]
 
         else:
           top_n = sorted_transfers[:n]
-          result = [f"{row['id']}({row['amt']})" for row in top_n]
+          result = [f"{row['id']}({-row['amt']})" for row in top_n]
 
         return result
 
