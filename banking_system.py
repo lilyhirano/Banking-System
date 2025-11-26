@@ -1,5 +1,6 @@
 from abc import ABC
 import numpy as np
+import math
 
 class Account():
     
@@ -8,6 +9,7 @@ class Account():
       self.balance = 0
       self.record = {} #timestamp : balance
       self.transfer_amt = 0
+      self.payments = [] #bool, timestamp, payment amt, paymentNum
 
     def update_balance(self, amount : int):
         self.balance += amount
@@ -23,6 +25,17 @@ class BankingSystem(ABC):
     `BankingSystem` interface.
     """
     ACCOUNTS = {} #account_id : Account
+    NUM_PAYMENTS = 0
+
+    def update_cashback(self, account_id, timestamp):
+      
+      for i in range(len(self.ACCOUNTS[account_id].payments)): #do the cash back
+          payment = self.ACCOUNTS[account_id].payments[i]
+
+          if not payment[0] and timestamp >= payment[1] + 86400000:
+                self.ACCOUNTS[account_id].update_balance(math.floor(payment[2] * 0.02))
+                self.ACCOUNTS[account_id].update_record(timestamp)
+                self.ACCOUNTS[account_id].payments[i][0] = True
 
     def create_account(self, timestamp: int, account_id: str) -> bool:
         """
@@ -52,6 +65,8 @@ class BankingSystem(ABC):
         if account_id not in self.ACCOUNTS.keys():
           return None
         
+        self.update_cashback(account_id, timestamp)
+
         self.ACCOUNTS[account_id].update_balance(amount)
         self.ACCOUNTS[account_id].update_record(timestamp)
 
@@ -72,15 +87,18 @@ class BankingSystem(ABC):
           * Returns `None` if account `source_account_id` has
           insufficient funds to perform the transfer.
         """
+
         if source_account_id == target_account_id:
            return None
 
         if source_account_id not in self.ACCOUNTS.keys() or target_account_id not in self.ACCOUNTS.keys():
           return None
         
+        self.update_cashback(source_account_id, timestamp)
+        
         if self.ACCOUNTS[source_account_id].balance < amount:
            return None
-        
+
         self.ACCOUNTS[source_account_id].update_balance(-1 * amount)
         self.ACCOUNTS[target_account_id].update_balance(amount)
 
@@ -156,8 +174,23 @@ class BankingSystem(ABC):
           amount must be refunded to the account before any other
           transactions are performed at the relevant timestamp.
         """
-        # default implementation
-        return None
+
+        if account_id not in self.ACCOUNTS.keys():
+           return None
+        
+        self.update_cashback(account_id, timestamp)
+
+        if self.ACCOUNTS[account_id].balance < amount:
+           return None
+        
+        self.NUM_PAYMENTS += 1
+
+        self.deposit(timestamp, account_id, -amount) #withdraw by depositing negative amt
+        self.ACCOUNTS[account_id].transfer_amt += amount #update record for top spenders
+        self.ACCOUNTS[account_id].payments.append([False, timestamp, amount, f"payment{self.NUM_PAYMENTS}"]) #update cashback record
+        
+        return f"payment{self.NUM_PAYMENTS}"
+
 
     def get_payment_status(self, timestamp: int, account_id: str, payment: str) -> str | None:
         """
@@ -172,8 +205,24 @@ class BankingSystem(ABC):
           * Returns a string representing the payment status:
           `"IN_PROGRESS"` or `"CASHBACK_RECEIVED"`.
         """
-        # default implementation
-        return None
+        if account_id not in self.ACCOUNTS.keys():
+          return None
+        
+        self.update_cashback(account_id, timestamp)
+        
+        current = self.ACCOUNTS[account_id].payments
+
+        payments = [y[3] for y in current]
+        if payment not in payments:
+           return None
+        
+        for record in current:
+          if record[3] == payment:
+             if record[0]:
+                return 'CASHBACK_RECEIVED'
+             else:
+                return 'IN_PROGRESS'
+                
 
     def merge_accounts(self, timestamp: int, account_id_1: str, account_id_2: str) -> bool:
         """
