@@ -28,6 +28,8 @@ class BankingSystem(ABC):
       self.ACCOUNTS = {} #account_id : Account
       self.NUM_PAYMENTS = 0
 
+      self.DELETED_ACCOUNTS = {} #account_id : [merge_time, record]
+
     def update_cashback(self, account_id, timestamp):
       if self.ACCOUNTS[account_id].payments: #if history of payments
         for i in range(len(self.ACCOUNTS[account_id].payments)): #do the cash back
@@ -209,7 +211,7 @@ class BankingSystem(ABC):
         if account_id not in self.ACCOUNTS.keys():
           return None
         
-        self.update_cashback(account_id, timestamp)
+        self.update_cashback(account_id, timestamp) #update cashback first
         
         current = self.ACCOUNTS[account_id].payments
 
@@ -217,11 +219,11 @@ class BankingSystem(ABC):
         if payment not in payments:
            return None
         
-        for record in current:
+        for record in current: #check the record for certain payment
           if record[3] == payment:
-             if record[0]:
+             if record[0]: #if True, then cashback has already been redeemed
                 return 'CASHBACK_RECEIVED'
-             else:
+             else: #otherwise it is still in progress
                 return 'IN_PROGRESS'
                 
 
@@ -265,14 +267,11 @@ class BankingSystem(ABC):
           for i in range(len(self.ACCOUNTS[account_id_1].payments)): 
             self.ACCOUNTS[account_id_1].payments[i][3] = f'payment{i + 1}'
 
-        self.ACCOUNTS[account_id_1].record.update(acc_2.record)
+        self.ACCOUNTS[account_id_1].record
         self.ACCOUNTS[account_id_1].transfer_amt += acc_2.transfer_amt
-        
+        self.deposit(timestamp=timestamp, account_id=account_id_1, amount = acc_2.balance)
 
-        #self.deposit(timestamp=timestamp, account_id=account_id_1, amount = acc_2.balance)
-        self.ACCOUNTS[account_id_1].update_balance(acc_2.balance)
-        self.ACCOUNTS[account_id_1].update_record(timestamp)
-
+        self.DELETED_ACCOUNTS[account_id_2] = [timestamp, self.ACCOUNTS[account_id_2].record]
         del self.ACCOUNTS[account_id_2] #delete account2 from the accounts record
 
         return True
@@ -290,8 +289,31 @@ class BankingSystem(ABC):
           * If the account was merged into another account, the merged
           account should inherit its balance history.
         """
+        if account_id in self.ACCOUNTS.keys():
+          self.update_cashback(account_id, time_at)
+
+          keys = self.ACCOUNTS[account_id].record.keys() #if record has been deleted
+          record_at_time = self.ACCOUNTS[account_id].record
+
+        elif account_id in self.DELETED_ACCOUNTS.keys():
+          
+          if time_at >= self.DELETED_ACCOUNTS[account_id][0]: #if trying to access after merge records
+             return None
+
+          keys = self.DELETED_ACCOUNTS[account_id][1].keys() #access the record times
+          record_at_time = self.DELETED_ACCOUNTS[account_id][1] #access whole record
         
-        if time_at in self.ACCOUNTS[account_id].record.keys():
-          return self.ACCOUNTS[account_id].record[time_at]
         else:
            return None
+
+        if time_at < min(keys): #if account not exist at time
+           return None
+        elif time_at in keys: #at that specific time
+          return record_at_time[time_at]
+        else:
+          i = 1
+          while True:
+             if time_at - i in keys:
+                return record_at_time[time_at - i]
+             i += 1
+        
