@@ -24,18 +24,19 @@ class BankingSystem(ABC):
     """
     `BankingSystem` interface.
     """
-    ACCOUNTS = {} #account_id : Account
-    NUM_PAYMENTS = 0
+    def __init__(self):
+      self.ACCOUNTS = {} #account_id : Account
+      self.NUM_PAYMENTS = 0
 
     def update_cashback(self, account_id, timestamp):
-      
-      for i in range(len(self.ACCOUNTS[account_id].payments)): #do the cash back
-          payment = self.ACCOUNTS[account_id].payments[i]
+      if self.ACCOUNTS[account_id].payments: #if history of payments
+        for i in range(len(self.ACCOUNTS[account_id].payments)): #do the cash back
+            payment = self.ACCOUNTS[account_id].payments[i]
 
-          if not payment[0] and timestamp >= payment[1] + 86400000:
-                self.ACCOUNTS[account_id].update_balance(math.floor(payment[2] * 0.02))
-                self.ACCOUNTS[account_id].update_record(timestamp)
-                self.ACCOUNTS[account_id].payments[i][0] = True
+            if not payment[0] and timestamp >= payment[1] + 86400000:
+                  self.ACCOUNTS[account_id].update_balance(math.floor(payment[2] * 0.02))
+                  self.ACCOUNTS[account_id].update_record(timestamp)
+                  self.ACCOUNTS[account_id].payments[i][0] = True
 
     def create_account(self, timestamp: int, account_id: str) -> bool:
         """
@@ -64,7 +65,7 @@ class BankingSystem(ABC):
         """
         if account_id not in self.ACCOUNTS.keys():
           return None
-        
+
         self.update_cashback(account_id, timestamp)
 
         self.ACCOUNTS[account_id].update_balance(amount)
@@ -177,8 +178,8 @@ class BankingSystem(ABC):
 
         if account_id not in self.ACCOUNTS.keys():
            return None
-        
-        self.update_cashback(account_id, timestamp)
+        if self.ACCOUNTS[account_id].payments: #if history of payments
+          self.update_cashback(account_id, timestamp)
 
         if self.ACCOUNTS[account_id].balance < amount:
            return None
@@ -248,8 +249,34 @@ class BankingSystem(ABC):
           * `account_id_2` should be removed from the system after the
           merge.
         """
-        # default implementation
-        return False
+        if account_id_1 not in self.ACCOUNTS.keys() or account_id_2 not in self.ACCOUNTS.keys():
+           return False
+        
+        if account_id_2 == account_id_1:
+           return False
+        
+        acc_2 = self.ACCOUNTS[account_id_2] #for quick reference NOT to update 
+
+        if acc_2.payments: #merge payments
+          self.ACCOUNTS[account_id_1].payments.extend(acc_2.payments)
+        #reorder payment number according to timestamp
+          self.ACCOUNTS[account_id_1].payments.sort(key = lambda x: x[1])
+
+          for i in range(len(self.ACCOUNTS[account_id_1].payments)): 
+            self.ACCOUNTS[account_id_1].payments[i][3] = f'payment{i + 1}'
+
+        self.ACCOUNTS[account_id_1].record.update(acc_2.record)
+        self.ACCOUNTS[account_id_1].transfer_amt += acc_2.transfer_amt
+        
+
+        #self.deposit(timestamp=timestamp, account_id=account_id_1, amount = acc_2.balance)
+        self.ACCOUNTS[account_id_1].update_balance(acc_2.balance)
+        self.ACCOUNTS[account_id_1].update_record(timestamp)
+
+        del self.ACCOUNTS[account_id_2] #delete account2 from the accounts record
+
+        return True
+        
 
     def get_balance(self, timestamp: int, account_id: str, time_at: int) -> int | None:
         """
@@ -263,5 +290,8 @@ class BankingSystem(ABC):
           * If the account was merged into another account, the merged
           account should inherit its balance history.
         """
-        # default implementation
-        return None
+        
+        if time_at in self.ACCOUNTS[account_id].record.keys():
+          return self.ACCOUNTS[account_id].record[time_at]
+        else:
+           return None

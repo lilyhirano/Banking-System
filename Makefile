@@ -37,16 +37,16 @@ test3:
 	python -m unittest level_3_tests.Level3Tests.test_level_3_case_10_all_operations_3
 
 test4:
-	python -m unittest level_4_tests.test_level_4_case_01_deletes_account_2_and_combines_balances
-	python -m unittest level_4_tests.test_level_4_case_02_shows_correct_spender_stats
-	python -m unittest level_4_tests.test_level_4_case_03_cashback_deposits_are_processed
-	python -m unittest level_4_tests.test_level_4_case_04_basic_get_balance
-	python -m unittest level_4_tests.test_level_4_case_05_get_balance_with_payment_cashback
-	python -m unittest level_4_tests.test_level_4_case_06_get_balance_edge_cases
-	python -m unittest level_4_tests.test_level_4_case_07_merge_edge_cases
-	python -m unittest level_4_tests.test_level_4_case_08_all_operations_1
-	python -m unittest level_4_tests.test_level_4_case_09_all_operations_2
-	python -m unittest level_4_tests.test_level_4_case_10_all_operations_3
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_01_deletes_account_2_and_combines_balances
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_02_shows_correct_spender_stats
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_03_cashback_deposits_are_processed
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_04_basic_get_balance
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_05_get_balance_with_payment_cashback
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_06_get_balance_edge_cases
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_07_merge_edge_cases
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_08_all_operations_1
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_09_all_operations_2
+	python -m unittest level_4_tests.Level4Tests.test_level_4_case_10_all_operations_3
 
 
 custom_test:
